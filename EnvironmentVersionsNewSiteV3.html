@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CORE Versions Per Env</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* General styling */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    /* Header and logo styling */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-color: #fefefe; /* Light white background for logo */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header img {
+      height: 50px;
+    }
+
+    /* Content container */
+    .content-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table and button layout */
+    .table-controls {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 20px;
+    }
+
+    #refreshButton {
+      background-color: #4CAF50; /* Green background */
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-weight: bold;
+    }
+
+    #refreshButton:hover {
+      background-color: #45a049;
+      transform: translateY(-2px);
+    }
+
+    /* Table styling */
+    #contentTable {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f15a2b; /* Header background color */
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #ecf0f1;
+    }
+
+    td {
+      border-bottom: 1px solid #ddd;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header with logo -->
+  <div class="header">
+    <img src="https://investors.global-e.com/sites/g/files/knoqqb61136/files/logo_color.png" alt="Company Logo">
+  </div>
+
+  <!-- Content container with button and table -->
+  <div class="content-container">
+    <div class="table-controls">
+      <button id="refreshButton" aria-label="Refresh Data">Refresh</button>
+    </div>
+
+    <table id="contentTable">
+      <tr>
+        <th>Environment</th>
+        <th>Version \ Branch</th>
+      </tr>
+      <!-- Placeholder rows for data -->
+    </table>
+  </div>
+
+  <script>
+    const urls = [
+      'https://qa.bglobale.com/version.html',      // Corresponds to QA
+      'https://web-hf.bglobale.com/version.html',  // Corresponds to QA-HF
+      'https://www.bglobale.com/version.html',     // Corresponds to INT
+      'https://www2.bglobale.com/version.html',    // Corresponds to STG
+      'https://web.global-e.com/version.html',     // Corresponds to PROD
+      'https://web-lt.bglobale.com/version.html'   // Corresponds to LT
+    ];
+
+    const envNames = ["QA", "QA-HF", "INT", "STG", "PROD", "LT"];
+
+    function fetchData() {
+      const table = document.getElementById('contentTable');
+
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+
+      urls.forEach((url, index) => {
+        const noCacheUrl = `${url}?t=${new Date().getTime()}`;
+        const row = table.insertRow(-1);
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+
+        cell1.textContent = envNames[index];
+
+        fetch(noCacheUrl)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.text();
+          })
+          .then(data => {
+            cell2.textContent = data;
+          })
+          .catch(error => {
+            console.error('Fetch operation error:', error);
+            cell2.textContent = 'Failed to load';
+          });
+      });
+    }
+
+    document.getElementById('refreshButton').addEventListener('click', fetchData);
+
+    fetchData(); 
+  </script>
+
+</body>
+</html>
